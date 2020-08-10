@@ -1,26 +1,40 @@
 /* IMPORTS */
 const express = require("express");
 const fs = require("fs");
+const morgan = require("morgan");
 
 /* EJECUTAR EXPRESS */
 const app = express();
+
+/* MIDDLEWARE */
+/* Logger que nos brinda información sobre las peticiones http */
+app.use(morgan("dev"));
+/* Con esto podemos acceder al body del objeto request */
+app.use(express.json());
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
 
 /* LEER DATA */
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
-/* FUNCIONES */
+/* ROUTING HANDLERS */
 const getAllTours = (req, res) => {
-  res
-    .status(200)
-    .json({ status: "success", results: tours.length, data: { tours } });
+  res.status(200).json({
+    status: "success",
+    requestedAt: req.requestTime,
+    results: tours.length,
+    data: { tours },
+  });
 };
 
 const getTour = (req, res) => {
   const id = req.params.id * 1;
   if (id > tours.length) {
-    res.status(404).json({ status: "fail", message: "Invalid ID" });
+    return res.status(404).json({ status: "fail", message: "Invalid ID" });
   }
   const tour = tours.find((tour) => tour.id === id);
   res.status(200).json({ status: "success", data: { tour } });
@@ -45,7 +59,7 @@ const createTour = (req, res) => {
 const upadateTour = (req, res) => {
   const id = req.params.id * 1;
   if (id > tours.length) {
-    res.status(404).json({ status: "fail", message: "Invalid ID" });
+    return res.status(404).json({ status: "fail", message: "Invalid ID" });
   }
   res.status(200).json({
     status: "success",
@@ -56,16 +70,13 @@ const upadateTour = (req, res) => {
 const deleteTour = (req, res) => {
   const id = req.params.id * 1;
   if (id > tours.length) {
-    res.status(404).json({ status: "fail", message: "Invalid ID" });
+    return res.status(404).json({ status: "fail", message: "Invalid ID" });
   }
   res.status(204).json({
     status: "success",
     data: null,
   });
 };
-
-/* MIDDLEWARE */
-app.use(express.json());
 
 /* ROUTING */
 app.route("/api/v1/tours").get(getAllTours).post(createTour);
