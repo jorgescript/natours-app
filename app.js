@@ -8,8 +8,10 @@ const userRouter = require("./routes/userRoutes");
 const app = express();
 
 /* MIDDLEWARE */
-/* Logger que nos brinda información sobre las peticiones http */
-app.use(morgan("dev"));
+if (process.env.NODE_ENV === "development") {
+  /* Logger que nos brinda información sobre las peticiones http */
+  app.use(morgan("dev"));
+}
 /* Con esto podemos acceder al body del objeto request */
 app.use(express.json());
 /* Añadimos la fecha de cuando se hizo la petición */
