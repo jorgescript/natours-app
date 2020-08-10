@@ -1,0 +1,11 @@
+{
+  "name": "natours-app",
+  "version": "1.0.0",
+  "description": "Aprendiendo node.js, express y mongoDB.",
+  "main": "app.js",
+  "author": "Jorge Mosqueda",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
