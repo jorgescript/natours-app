@@ -1,10 +1,9 @@
 /* IMPORTS */
 const dotenv = require("dotenv");
-const mongoose = require("mongoose");
-const app = require("./app");
-
 /* VARIABLES DE ENTORNO */
 dotenv.config({ path: "./config.env" });
+const mongoose = require("mongoose");
+const app = require("./app");
 
 /* BASE DE DATOS */
 const DB = process.env.DATABASE.replace("<PASSWORD>", process.env.PASSWORD);
