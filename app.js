@@ -1,6 +1,11 @@
 /* IMPORTS */
 const express = require("express");
 const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
+const hpp = require("hpp");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const AppError = require("./utils/appError");
@@ -9,13 +14,47 @@ const globalErrorHandler = require("./controllers/errorController");
 /* EJECUTAR EXPRESS */
 const app = express();
 
-/* MIDDLEWARE */
+/* GLOBAL MIDDLEWARE */
+/* Establece encabezados http seguros */
+app.use(helmet());
+
 if (process.env.NODE_ENV === "development") {
   /* Logger que nos brinda información sobre las peticiones http */
   app.use(morgan("dev"));
 }
-/* Con esto podemos acceder al body del objeto request */
-app.use(express.json());
+
+/* Limita las peticiones a la API */
+const limiter = rateLimit({
+  /* Maximo 100 peticiones por hora en una misma ip */
+  max: 100,
+  windowMs: 60 * 6 * 1000,
+  message: "Too many request from this IP, try again in an hour",
+});
+app.use("/api", limiter);
+
+/* Con esto podemos acceder al body del objeto request y establece el limite de datos que se pueden enviar*/
+app.use(express.json({ limit: "10kb" }));
+
+/* Sanitización de los datos query injection */
+app.use(mongoSanitize());
+
+/* Sanitización de los datos XSS */
+app.use(xss());
+
+/* Previene la contamienación de parametros */
+app.use(
+  hpp({
+    whitelist: [
+      "ratingsQuantity",
+      "ratingsAverage",
+      "maxGroupSize",
+      "difficulty",
+      "duration",
+      "price",
+    ],
+  })
+);
+
 /* Añadimos la fecha de cuando se hizo la petición */
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
