@@ -77,6 +77,37 @@ const tourSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    /* Geospacial coordinates */
+    startLocation: {
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    /* Embebed document */
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "users",
+      },
+    ],
   },
   /* propiedades virtuales */
   {
@@ -88,6 +119,12 @@ const tourSchema = mongoose.Schema(
 /* VIRTUAL PROPERTIES */
 tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
+});
+
+tourSchema.virtual("reviews", {
+  ref: "reviews",
+  foreignField: "tour",
+  localField: "_id",
 });
 
 /* DOCUMENT MIDDELWARE */
@@ -107,6 +144,14 @@ tourSchema.pre(/^find/, function (next) {
   /* this es la query actual */
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt",
+  });
   next();
 });
 
