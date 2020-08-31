@@ -15,6 +15,7 @@ const {
   forgotPassword,
   resetPassword,
   protect,
+  restrict,
   updatePassword,
 } = require("../controllers/authController");
 
@@ -30,7 +31,11 @@ router.patch("/update-my-password", protect, updatePassword);
 router.get("/me", protect, getMe, getUser);
 router.patch("/update-my-data", protect, updateMe);
 router.delete("/delete-my-user", protect, deleteMe);
-router.route("/").get(getAllUsers);
-router.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
+router.route("/").get(protect, restrict("admin"), getAllUsers);
+router
+  .route("/:id")
+  .get(protect, getUser)
+  .patch(protect, restrict("admin"), restrict("admin"), updateUser)
+  .delete(protect, restrict("admin"), deleteUser);
 
 module.exports = router;

@@ -9,7 +9,6 @@ const {
   updateReview,
   setTourUserIds,
 } = require("../controllers/reviewController");
-const { get } = require("mongoose");
 
 /* ROUTER */
 const router = express.Router({ mergeParams: true });
@@ -17,6 +16,10 @@ router
   .route("/")
   .get(getReviews)
   .post(protect, restrict("user"), setTourUserIds, createReview);
-router.route("/:id").get(getReview).delete(deleteReview).patch(updateReview);
+router
+  .route("/:id")
+  .get(getReview)
+  .delete(protect, restrict("user", "admin"), deleteReview)
+  .patch(protect, restrict("user", "admin"), updateReview);
 
 module.exports = router;
