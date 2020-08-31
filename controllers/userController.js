@@ -4,6 +4,12 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const { getAll, getOne, deleteOne, updateOne } = require("./handleFactory");
 
+/* MIDDELWARE */
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
+
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).forEach((el) => {
