@@ -1,25 +1,29 @@
 /* IMPORTS */
 const Review = require("../models/reviewModel");
-const catchAsync = require("../utils/catchAsync");
+const {
+  createOne,
+  deleteOne,
+  getAll,
+  getOne,
+  updateOne,
+} = require("./handleFactory");
 
-/* ROUTES HANDLERS */
-exports.getReviews = catchAsync(async (req, res, next) => {
-  let filter = {};
-  /* Validamos si existe el parametro */
-  if (req.params.tourId) filter = { tour: req.params.tourId };
-  const reviews = await Review.find(filter);
-  res.status(200).json({
-    status: "success",
-    results: reviews.length,
-    data: { reviews },
-  });
-});
-exports.createReview = catchAsync(async (req, res, next) => {
+/* MIDDLEWARES */
+exports.setTourUserIds = (req, res, next) => {
   if (!req.body.tour) req.body.tour = req.params.tourId;
   if (!req.body.user) req.body.user = req.user.id;
-  const newReview = await Review.create(req.body);
-  res.status(201).json({
-    status: "success",
-    data: { review: newReview },
-  });
-});
+  next();
+};
+
+/* ROUTES HANDLERS */
+/* Traer las reviews */
+exports.getReviews = getAll(Review);
+
+/* Crear review */
+exports.createReview = createOne(Review);
+/* Traer review */
+exports.getReview = getOne(Review);
+/* Actualizar review */
+exports.updateReview = updateOne(Review);
+/* Eliminar review */
+exports.deleteReview = deleteOne(Review);

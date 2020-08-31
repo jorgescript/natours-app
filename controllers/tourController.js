@@ -1,8 +1,13 @@
 /* IMPORTS */
 const Tour = require("../models/tourModel");
-const APIFeatures = require("../utils/apiFeatures");
 const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/appError");
+const {
+  createOne,
+  deleteOne,
+  getAll,
+  getOne,
+  updateOne,
+} = require("./handleFactory");
 
 /* ROUTES HANDLERS */
 exports.aliasTopTours = (req, res, next) => {
@@ -11,60 +16,15 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
-  res.status(201).json({ status: "success", data: { tour: newTour } });
-});
-
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  /* Contruimos la query */
-  const features = new APIFeatures(Tour, req.query)
-    .filter()
-    .sort()
-    .limit()
-    .paginate();
-  /* Ejecutamos la query */
-  const tours = await features.query;
-  /* Enviar respuesta */
-  res.status(200).json({
-    status: "success",
-    results: tours.length,
-    data: { tours },
-  });
-});
-
-exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate("reviews");
-  /* Sino existe un tour mandamos un error */
-  if (!tour) return next(new AppError("No tour found with that ID", 404));
-  /* Si existe devolvolvemos el tour */
-  res.status(200).json({ status: "success", data: { tour } });
-});
-
-exports.upadateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  /* Sino existe un tour mandamos un error */
-  if (!tour) return next(new AppError("No tour found with that ID", 404));
-  /* Si existe devolvolvemos el tour */
-  res.status(200).json({
-    status: "success",
-    data: { tour },
-  });
-});
-
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-  /* Sino existe un tour mandamos un error */
-  if (!tour) return next(new AppError("No tour found with that ID", 404));
-  /* Si existe devolvolvemos el tour */
-  res.status(204).json({
-    status: "success",
-    data: null,
-  });
-});
+exports.getAllTours = getAll(Tour);
+/* Crear tour */
+exports.createTour = createOne(Tour);
+/* Traer un tour */
+exports.getTour = getOne(Tour, { path: "reviews" });
+/* Actualizar tour */
+exports.upadateTour = updateOne(Tour);
+/* Eliminar tour */
+exports.deleteTour = deleteOne(Tour);
 
 /* AGREGATION PIPELINES */
 exports.getTourStats = catchAsync(async (req, res, next) => {

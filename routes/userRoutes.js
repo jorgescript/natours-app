@@ -1,7 +1,6 @@
 /* IMPORTS */
 const express = require("express");
 const {
-  createUser,
   deleteUser,
   getAllUsers,
   getUser,
@@ -27,7 +26,7 @@ router.patch("/reset-password/:token", resetPassword);
 router.patch("/update-my-password", protect, updatePassword);
 router.patch("/update-my-data", protect, updateMe);
 router.delete("/delete-my-user", protect, deleteMe);
-router.route("/").get(getAllUsers).post(createUser);
+router.route("/").get(getAllUsers);
 router.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
 
 module.exports = router;
