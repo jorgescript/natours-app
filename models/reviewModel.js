@@ -37,6 +37,9 @@ const reviewSchema = mongoose.Schema(
   }
 );
 
+/* INDEXES */
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 /* STATIC METHODS */
 reviewSchema.statics.calcAverageRatings = async function (tourId) {
   /* AGREGATION PIPELINES */
