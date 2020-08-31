@@ -8,6 +8,7 @@ const {
   getOne,
   updateOne,
 } = require("./handleFactory");
+const AppError = require("../utils/appError");
 
 /* ROUTES HANDLERS */
 exports.aliasTopTours = (req, res, next) => {
@@ -15,6 +16,26 @@ exports.aliasTopTours = (req, res, next) => {
   req.query.sort = "-ratingsAverage,price";
   next();
 };
+
+exports.getToursWithin = catchAsync(async (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  const [lat, long] = latlng.split(",");
+  const radius = unit === "mi" ? distance / 3963.2 : distance / 6378.1;
+  if (!lat || !long) {
+    return next(
+      new AppError(
+        "Please provide latitud and longitud in the format lat,lng",
+        400
+      )
+    );
+  }
+  const tours = await Tour.find({
+    startLocation: { $geoWithin: { $centerSphere: [[long, lat], radius] } },
+  });
+  res
+    .status(200)
+    .json({ status: "success", results: tours.length, data: { data: tours } });
+});
 
 exports.getAllTours = getAll(Tour);
 /* Crear tour */
