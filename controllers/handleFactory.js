@@ -40,7 +40,7 @@ exports.getAll = (Model) => {
       .limit()
       .paginate();
     /* Ejecutamos la query */
-    const docs = await features.query;
+    const docs = await features.query; //.explain(); nos da info de la query
     /* Enviar respuesta */
     res.status(200).json({
       status: "success",
