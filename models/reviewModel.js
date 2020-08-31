@@ -1,5 +1,7 @@
 /* IMPORTS  */
 const mongoose = require("mongoose");
+const Tour = require("./tourModel");
+const AppError = require("../utils/appError");
 
 const reviewSchema = mongoose.Schema(
   {
@@ -35,20 +37,62 @@ const reviewSchema = mongoose.Schema(
   }
 );
 
+/* STATIC METHODS */
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
+  /* AGREGATION PIPELINES */
+  /* this apunta al modelo actual */
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: "$tour",
+        nRatings: { $sum: 1 },
+        avgRating: { $avg: "$rating" },
+      },
+    },
+  ]);
+  //console.log(stats);
+
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRatings,
+      ratingsAverage: stats[0].avgRating,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5,
+    });
+  }
+};
+
 /* QUERY MIDDLEWARE */
 reviewSchema.pre(/^find/, function (next) {
-  /* this.populate({
-    path: "tour",
-    select: "name",
-  }).populate({
-    path: "user",
-    select: "name photo",
-  }); */
   this.populate({
     path: "user",
     select: "name photo",
   });
   next();
+});
+
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  this.rev = await this.findOne();
+  if (!this.rev) {
+    next(new AppError("No document found with that ID", 404));
+  }
+  next();
+});
+
+/* DOCUMENT MIDDLEWARE */
+reviewSchema.post("save", function () {
+  /* this apunta a la review actual */
+  this.constructor.calcAverageRatings(this.tour);
+});
+
+reviewSchema.post(/^findOneAnd/, function () {
+  this.rev.constructor.calcAverageRatings(this.rev.tour);
 });
 
 const Review = mongoose.model("reviews", reviewSchema);
