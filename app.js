@@ -25,8 +25,10 @@ app.set("views", path.join(__dirname, "views"));
 /* Archivos estaticos */
 app.use(express.static(path.join(__dirname, "public")));
 
-/* Establece encabezados http seguros */
-app.use(helmet());
+if (process.env.NODE_ENV === "production") {
+  /* Establece encabezados http seguros */
+  app.use(helmet());
+}
 
 if (process.env.NODE_ENV === "development") {
   /* Logger que nos brinda información sobre las peticiones http */
