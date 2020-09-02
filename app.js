@@ -1,4 +1,5 @@
 /* IMPORTS */
+const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
@@ -9,13 +10,21 @@ const hpp = require("hpp");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
+const viewsRouter = require("./routes/viewRoutes");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
 
 /* EJECUTAR EXPRESS */
 const app = express();
 
+/* CONFIGURANDO PUG */
+app.set("view engine", "pug");
+app.set("views", path.join(__dirname, "views"));
+
 /* GLOBAL MIDDLEWARE */
+/* Archivos estaticos */
+app.use(express.static(path.join(__dirname, "public")));
+
 /* Establece encabezados http seguros */
 app.use(helmet());
 
@@ -63,13 +72,18 @@ app.use((req, res, next) => {
 });
 
 /* ROUTING */
+/* VIEWS */
+app.use("/", viewsRouter);
+
+/* API */
 /* Tours routes */
 app.use("/api/v1/tours", tourRouter);
 /* Users routes */
 app.use("/api/v1/users", userRouter);
 /* Review routes */
 app.use("/api/v1/reviews", reviewRouter);
-/* routes no definidas */
+
+/* RUTAS NO DEFINIDAS */
 app.all("*", (req, res, next) => {
   /* Express sabe que si pasamos un argumento e next es un error */
   next(new AppError(`Cant find ${req.originalUrl}`, 404));
