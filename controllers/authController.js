@@ -56,7 +56,7 @@ exports.login = catchAsync(async (req, res, next) => {
 /* LOG OUT */
 exports.logout = (req, res) => {
   res.cookie("jwt", "bye", {
-    expires: new Date(Date.now() + 1 * 1000),
+    expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
   });
   res.status(200).json({ status: "success" });
@@ -97,6 +97,9 @@ exports.protect = catchAsync(async (req, res, next) => {
       new AppError("User recently changed password please log in again", 401)
     );
   }
+  /* Añadimos el usuario a res.locals.user */
+  res.locals.user = currentUser;
+  /* Creamos una propieda user en res */
   req.user = currentUser;
   next();
 });
@@ -211,7 +214,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   }
   /* Actualizamos la contraseña */
   user.password = req.body.password;
-  user.passwordConfirm = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
   /* Hacemos log in */
   sendToken(user, 201, res);
