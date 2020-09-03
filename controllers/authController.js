@@ -53,6 +53,15 @@ exports.login = catchAsync(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
+/* LOG OUT */
+exports.logout = (req, res) => {
+  res.cookie("jwt", "bye", {
+    expires: new Date(Date.now() + 1 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: "success" });
+};
+
 /* PROTECT ROUTES */
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
@@ -62,7 +71,11 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
+
+  /* Validamos sino existe el token */
   if (!token) {
     return next(new AppError("You are not logged in", 401));
   }
@@ -99,6 +112,33 @@ exports.restrict = (...roles) => {
     }
     next();
   };
+};
+
+/* VERIFICAR SI ESTA LOGGEADO */
+/* Solo para renderisar paginas */
+exports.isLoggedIn = async (req, res, next) => {
+  /* Traemos el token y verificamos que exista */
+  if (req.cookies.jwt) {
+    try {
+      /* Verificamos el token */
+      const decoded = await jwt.verify(req.cookies.jwt, process.env.JTW_SECRET);
+      /* Verificamos si el usuario aun existe */
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+      /* Verificamos si el usuario cambio de contraseña */
+      if (currentUser.changePasswordAfter(decoded.iat)) {
+        return next();
+      }
+      /* Añadimos el usuario a res.locals.user */
+      res.locals.user = currentUser;
+      return next();
+    } catch (err) {
+      return next();
+    }
+  }
+  next();
 };
 
 /* FORGOR PASSWOR */

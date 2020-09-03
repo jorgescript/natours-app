@@ -7,6 +7,7 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
+const cookieParser = require("cookie-parser");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
@@ -44,8 +45,11 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
-/* Con esto podemos acceder al body del objeto request y establece el limite de datos que se pueden enviar*/
+/* Con esto podemos acceder al body dentro del obj request y establece el limite de datos que se pueden enviar */
 app.use(express.json({ limit: "10kb" }));
+
+/* Con esto podemos acceder a las cookies dentro del obj request */
+app.use(cookieParser());
 
 /* Sanitización de los datos query injection */
 app.use(mongoSanitize());
@@ -70,6 +74,7 @@ app.use(
 /* Añadimos la fecha de cuando se hizo la petición */
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
+  console.log(req.cookies);
   next();
 });
 
