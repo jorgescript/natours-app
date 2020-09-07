@@ -17,7 +17,11 @@ const app = require("./app");
 /* BASE DE DATOS */
 const DB = process.env.DATABASE.replace("<PASSWORD>", process.env.PASSWORD);
 mongoose
-  .connect(DB, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+  })
   .then(() => console.log("SUCCESSFUL CONECTION"));
 
 /* SERVER */

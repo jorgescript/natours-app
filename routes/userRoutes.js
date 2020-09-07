@@ -5,9 +5,11 @@ const {
   getAllUsers,
   getMe,
   getUser,
+  resizeUserPhoto,
   updateUser,
   updateMe,
   deleteMe,
+  uploadUserPhoto,
 } = require("../controllers/userController");
 const {
   signup,
@@ -31,7 +33,13 @@ router.patch("/reset-password/:token", resetPassword);
 router.patch("/update-my-password", protect, updatePassword);
 /* User */
 router.get("/me", protect, getMe, getUser);
-router.patch("/update-my-data", protect, updateMe);
+router.patch(
+  "/update-my-data",
+  protect,
+  uploadUserPhoto,
+  resizeUserPhoto,
+  updateMe
+);
 router.delete("/delete-my-user", protect, deleteMe);
 router.route("/").get(protect, restrict("admin"), getAllUsers);
 router

@@ -8,6 +8,7 @@
 # production
 /public
 config.env
+/.cache
 
 # misc
 .DS_Store

@@ -74,7 +74,6 @@ app.use(
 /* Añadimos la fecha de cuando se hizo la petición */
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  console.log(req.cookies);
   next();
 });
 
