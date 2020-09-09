@@ -6,7 +6,6 @@
 .pnp.js
 
 # production
-/public
 config.env
 /.cache
 
