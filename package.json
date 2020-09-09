@@ -6,12 +6,7 @@
   "author": "Jorge Mosqueda",
   "license": "MIT",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "debug": "ndb server.js",
-    "build": "NODE_ENV=production nodemon server.js",
-    "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js",
-    "build:js": "parcel build ./public/js/index.js --out-dir ./public/js --out-file bundle.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "@babel/polyfill": "^7.11.5",
