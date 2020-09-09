@@ -12,6 +12,7 @@ const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
 const viewsRouter = require("./routes/viewRoutes");
+const bookingRouter = require("./routes/bookingRoutes");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
 
@@ -88,6 +89,8 @@ app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
 /* Review routes */
 app.use("/api/v1/reviews", reviewRouter);
+/* Booking router */
+app.use("/api/v1/bookings", bookingRouter);
 
 /* RUTAS NO DEFINIDAS */
 app.all("*", (req, res, next) => {

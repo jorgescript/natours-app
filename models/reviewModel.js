@@ -72,6 +72,7 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
 };
 
 /* QUERY MIDDLEWARE */
+/* POPULATE */
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: "user",
