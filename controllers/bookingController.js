@@ -44,11 +44,14 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 });
 
 exports.createBookingCheckout = catchAsync(async (req, res, next) => {
-  console.log("entre");
   const { tour, user, price } = req.query;
   if (!tour && !user && !price) return next();
-  console.log("Pase la condicion");
   await Booking.create({ tour, user, price });
   res.redirect(req.originalUrl.split("?")[0]);
-  //next();
 });
+
+exports.createBooking = createOne(Booking);
+exports.getBooking = getOne(Booking);
+exports.getAllBookings = getAll(Booking);
+exports.deleteBooking = deleteOne(Booking);
+exports.updateBooking = updateOne(Booking);

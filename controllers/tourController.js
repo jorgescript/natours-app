@@ -112,6 +112,7 @@ exports.getAllTours = getAll(Tour);
 /* Crear tour */
 exports.createTour = createOne(Tour);
 /* Traer un tour */
+/* Agregamos las reviews (populate) */
 exports.getTour = getOne(Tour, { path: "reviews" });
 /* Actualizar tour */
 exports.upadateTour = updateOne(Tour);
