@@ -6,8 +6,8 @@ const mongoose = require("mongoose");
 
 /* UNCAUGTH EXCEPTION */
 process.on("uncaughtException", (err) => {
-  console.log({ name: err.name, error: err.message });
-  console.log("UNCAUGTH EXCEPTION! Shutting down the server...");
+  console.error({ name: err.name, error: err.message });
+  console.error("UNCAUGTH EXCEPTION! Shutting down the server...");
   process.exit(1);
 });
 
@@ -22,7 +22,9 @@ mongoose
     useUnifiedTopology: true,
     useFindAndModify: false,
   })
-  .then(() => console.log("SUCCESSFUL CONECTION"));
+  .then(() => {
+    console.log("SUCCESSFUL CONECTION");
+  });
 
 /* SERVER */
 const server = app.listen(process.env.PORT, () => {
@@ -31,7 +33,7 @@ const server = app.listen(process.env.PORT, () => {
 
 /* UNHANDLER REJECTION */
 process.on("unhandledRejection", (err) => {
-  console.log({ name: err.name, error: err.message });
-  console.log("UNHANDLER REJECTION! Shutting down the server...");
+  console.error({ name: err.name, error: err.message });
+  console.error("UNHANDLER REJECTION! Shutting down the server...");
   server.close(() => process.exit(1));
 });
