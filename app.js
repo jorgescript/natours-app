@@ -30,6 +30,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 if (process.env.NODE_ENV === "production") {
   /* Establece encabezados http seguros */
+  /* Leer más sobre la libreria */
   app.use(
     helmet({
       contentSecurityPolicy: false,
